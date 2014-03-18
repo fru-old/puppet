@@ -2,6 +2,7 @@ puppet.js
 =========
 
 Usage:
+
     Puppet("/testpage") creates singleton (no cleanup needed)
     new Puppet("/testpage").close() (instances needs to be closed)
     .visit() sets href
