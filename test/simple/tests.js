@@ -1,3 +1,5 @@
 test( "hello test", function() {
-	ok( "test" === Puppet(), "Passed!" );
+  Puppet("./simple/test.html");
+
+	equal( Puppet.active.length, 1 , "Passed!" );
 });

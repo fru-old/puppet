@@ -4,10 +4,28 @@
 <meta charset="utf-8">
 <title>QUnit Runner</title>
 <link rel="stylesheet" href="qunit.css">
+<link rel="stylesheet" href="../src/puppet.css">
 </head>
 <body>
+
 <div id="qunit"></div>
 <div id="qunit-fixture"></div>
+<div id="puppet">
+  <div id="puppet-header">Puppet IFrames</div>
+  <ol id="puppet-frames">
+    <li><strong>Example</strong><strong>./ex.html</strong><a>Show IFrame</a></li>
+    <li>
+      <strong>Testname</strong><strong>./simple/test.html</strong><a>Show IFrame</a>
+      <ol>
+        <li class="status">Status</li>
+        <li class="error">Error</li>
+        <li class="value">Value</li>
+      </ol>
+    </li>
+    <li><strong>./simple/simple.html</strong><a>Show IFrame</a></li>
+  </ol>
+</div>
+
 <script src="qunit.js"></script>
 
 <!-- Sources -->
