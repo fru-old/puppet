@@ -1,9 +1,161 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="style.css">
+		<script>
+			(function(global){
+				var domhelper = {
+					get: function(base, nodes){
+						if(nodes === undefined){
+							nodes = base;
+							base = document.body;
+						}
+						if(typeof nodes === 'string'){
+							nodes = base.querySelector(nodes);
+						}
+						if(!nodes)return [];
+						return nodes instanceof Array ? nodes : [nodes];
+					},
+					one: function(base, node){
+						return domhelper.get(base, node)[0];
+					},
+					remove: function(nodes){
+						nodes = domhelper.get(nodes);
+						for(var i in nodes)nodes[i].parentNode.removeChild(nodes[i]);
+					},
+					add: function(single, html, options){
+						if(html.join)html = html.join('\n');
+						single = domhelper.one(single);
+						var childs, child, wrapper = document.createElement('div');
+						if(typeof html === 'string'){
+							wrapper.innerHTML = html;
+							childs = wrapper.childNodes;
+						}else{
+							childs = domhelper.get(html);
+						}
+						for(var i in childs){
+							if(childs[i].nodeType !== 1)continue;
+							child = childs[i];
+							if(options)for(var o in options){
+								child[o] = options[o];
+							}
+							single.appendChild(child);
+						}
+						return child;
+					},
+
+					addOption: function(selector, name, onclick){
+						var select = domhelper.one(selector);
+						domhelper.add(select, ['<option>', name, '</option>'], {
+							onclick: function(){
+								select.options[0].selected = true;
+								onclick();
+							}
+						});
+					}
+				};
+
+				global.close = function(){
+					domhelper.remove('#puppet-open');
+					//TODO insert iframe back into holder
+				}
+
+				global.open = function(){
+					global.close();
+					domhelper.add(document.body, [
+						'<div id="puppet-open">',
+						' <div id="puppet-leftbar">',
+						'  <div class="header">',
+						'   <select>',
+						'    <option>Add Event</option>',
+						'   </select>',
+						'   <span class="icon cross" onclick="Puppet.close();">Close Puppet</span>',
+						'  </div>',
+						' </div>',
+						'</div>'
+					]);
+
+					var event = 'Typing';
+					var attributes = ['x', 'y', 'z'];
+
+					domhelper.addOption('#puppet-leftbar .header select', event, function(){
+
+						var eventdom = domhelper.add('#puppet-leftbar', [
+							'<div class="event">',
+							' <div class="event-name">',
+							event,
+							'  <span class="icon cross"></span>',
+							'  <span class="icon play">Run</span>',
+							' </div>',
+							' <div class="event-attr">',
+							'  <div class="added"></div>',
+							' </div>',
+							'</div>'
+						]);
+
+						domhelper.one(eventdom, '.cross').onclick = function(event) {
+							event.stopPropagation();
+							domhelper.remove(eventdom);
+							return true;
+						}
+
+						domhelper.one(eventdom, '.play').onclick = function(event) {
+							event.stopPropagation();
+						}
+
+						eventdom.onclick = function(){
+							domhelper.get('#puppet-leftbar .event-attr.expand').forEach(function(value){
+								value.classList.toggle('expand', false);
+							});
+							domhelper.one(eventdom, '.event-attr').classList.toggle('expand', true);
+						}
+
+						var addAttribute = function(label, value){
+							if(value instanceof Array){
+								value = value.map( function(s){ return '<option>'+s+'</option>'; }).join('\n');
+								value = '<select>'+value+'</select>';
+							}else{
+								value = '<input type="text" value="'+value+'"/>';
+							}
+							domhelper.add(domhelper.one(eventdom, '.event-attr .added'), [
+								'<div class="attr">',
+								' <span><input type="checkbox" checked="checked"/><label>'+label+'</label></span>',
+								' <span>'+value+'</span>',
+								'</div>'
+							]);
+						}
+
+						domhelper.add(domhelper.one(eventdom, '.event-attr'),[
+							'<div class="attr">',
+							' <span>',
+							'  <span class="icon plus"></span>',
+							' </span>',
+							' <span>',
+							'  <select class="options">',
+							'   <option></option>',
+							'  </select>',
+							' </span>',
+							'</div>'
+						]);
+
+						domhelper.addOption(domhelper.one(eventdom, '.event-attr .options'), 'x', function(){
+							alert("add attribute");
+						});
+
+
+						addAttribute('test1', '30px');
+						addAttribute('test1', ['true', 'false']);
+					});
+				}
+
+
+
+			}(window.Puppet = {}));
+
+		</script>
+
 	</head>
-	<body>
-		<div id="puppet-leftbar">
+	<body onload="Puppet.open()">
+		<!--<div id="puppet-leftbar">
 			<div class="header">
 				<select>
 					<option>Add Event</option>
@@ -88,6 +240,6 @@
 					<span class="icon play">Run</span>
 				</div>
 			</div>
-		</div>
+		</div>-->
 	</body>
 </html>
