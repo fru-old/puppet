@@ -33,7 +33,7 @@
 	content: "\32";
 }
 
-/**/
+/* defaults */
 
 
 h1{
@@ -106,7 +106,7 @@ input[type='text'], .attr select {
     padding: 1px;
 	margin: 0;
 }
-input[type='text']{
+input[type='text'], .attr select {
     border: #dedede 1px solid;
 }
 
