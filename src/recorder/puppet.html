@@ -3,6 +3,23 @@
 		<link rel="stylesheet" href="style.css">
 		<script>
 			(function(global){
+
+				global.plugins = [];
+
+				global.run = function(events, index){
+					var recurse = global.run;
+					if(!index)index = 0;
+					if(events instanceof Array){	
+						for(var i in events)recurse(events[i], index);
+					}else{
+
+					}
+				}
+
+
+
+
+
 				var domhelper = {
 					get: function(base, nodes){
 						if(nodes === undefined){
@@ -22,7 +39,7 @@
 						nodes = domhelper.get(nodes);
 						for(var i in nodes)nodes[i].parentNode.removeChild(nodes[i]);
 					},
-					add: function(single, html, options){
+					add: function(single, html){
 						if(html.join)html = html.join('\n');
 						single = domhelper.one(single);
 						var childs, child, wrapper = document.createElement('div');
@@ -35,9 +52,6 @@
 						for(var i in childs){
 							if(childs[i].nodeType !== 1)continue;
 							child = childs[i];
-							if(options)for(var o in options){
-								child[o] = options[o];
-							}
 							single.appendChild(child);
 						}
 						return child;
@@ -65,6 +79,24 @@
 					//TODO insert iframe back into holder
 				}
 
+
+				register
+					-> attachListener (iframe, attachEvent)
+					-> registerEvents (iframe, registerEvent)
+					-> execEventChain (iframe, event, next, log)
+
+				//created by open
+				attachEvent(name, initialAttributes, selectableAttributes){
+
+				}
+
+				serializeEvent(element){
+
+				}
+
+
+
+
 				global.open = function(){
 					global.close();
 					domhelper.add(document.body, [
@@ -82,7 +114,11 @@
 
 					var select = domhelper.buildSelect('#puppet-leftbar .header select');
 					var event = 'Typing';
-					var attributes = ['x', 'y', 'z'];
+					var attributes = {
+						'test': 'init'
+					}
+
+
 
 					select.add(event, function(){
 
