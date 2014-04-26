@@ -43,14 +43,20 @@
 						return child;
 					},
 
-					addOption: function(selector, name, onclick){
+					buildSelect: function(selector){
 						var select = domhelper.one(selector);
-						domhelper.add(select, ['<option>', name, '</option>'], {
-							onclick: function(){
-								select.options[0].selected = true;
-								onclick();
+						var addedOptions = {};
+						select.onchange = function(){
+							var name = select.value;
+							select.options[0].selected = true;
+							if(addedOptions[name])addedOptions[name]();
+						}
+						return {
+							add: function(name, onclick){
+								addedOptions[name] = onclick;
+								domhelper.add(select, ['<option>', name, '</option>']);
 							}
-						});
+						}
 					}
 				};
 
@@ -74,10 +80,11 @@
 						'</div>'
 					]);
 
+					var select = domhelper.buildSelect('#puppet-leftbar .header select');
 					var event = 'Typing';
 					var attributes = ['x', 'y', 'z'];
 
-					domhelper.addOption('#puppet-leftbar .header select', event, function(){
+					select.add(event, function(){
 
 						var eventdom = domhelper.add('#puppet-leftbar', [
 							'<div class="event">',
@@ -137,7 +144,9 @@
 							'</div>'
 						]);
 
-						domhelper.addOption(domhelper.one(eventdom, '.event-attr .options'), 'x', function(){
+						var event_select = domhelper.buildSelect(domhelper.one(eventdom, '.event-attr .options'));
+
+						event_select.add('x', function(){
 							alert("add attribute");
 						});
 
