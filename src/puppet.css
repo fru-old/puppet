@@ -10,11 +10,11 @@ h1{
   display: inline-block;
 }
 
-.collapse{
-  height: 0;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
+.hide{
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 
