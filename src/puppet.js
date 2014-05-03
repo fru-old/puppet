@@ -1,9 +1,10 @@
 (function(){
 
-	var global = window.Puppet = function(){
+	var global = window.Puppet = function(url){
 
 	};
 
+	global.fn = global.prototype = {};
 	global.plugins = [];
 
 	// Dom utilities used for basic manipulation	
@@ -43,8 +44,30 @@
 				single.appendChild(child);
 			}
 			return child;
+		},
+		text: function(base, node){
+			var result = [];
+			node = dom.one(base, node);
+			for (var i = 0; i < node.childNodes.length; i++) {
+    			var n = node.childNodes[i];
+    			if (n.nodeName === "#text")result.push(n.nodeValue);
+    		}
+    		return result;
 		}
 	};
+
+	document.addEventListener("DOMContentLoaded", function() {
+  		var puppet = dom.one("#puppet");
+		if(!puppet){
+			puppet = dom.add(document.body, ['<div id="puppet"></div>']);
+		}
+		dom.add(puppet, [
+			'<div id="puppet-header">Puppet IFrames</div>',
+  			' <ol id="puppet-frames"></ol>',
+  			'</div>',
+  			'<div id="puppet-iframe-popup" class="hide"></div>'
+		]);
+	});
 
 	
 	// Private methods for specific dom functionality
@@ -161,20 +184,24 @@
 	}
 
 	function serializeEvent(element){
-
+		var result = {};
+		var name = dom.text(element, '.event-name').join('').trim();
+		var attributes = dom.get(element, '.attr');
+		for(var i = 0; i < attributes.length; i++){
+			var attr = attributes[i];
+			var selected = dom.one(attr, 'input[type=checkbox]');
+			if(selected && selected.checked){
+				var label = dom.text(attr, 'label')[0];
+				var value = dom.one(attr, 'input[type=text], select').value;
+				if(!result.hasOwnProperty(label))result[label] = [];
+				result[label].push(value);
+			}
+		}
+		return JSON.stringify(result);
 	}
 
 	function initiatePuppet(){
-		var puppet = dom.one("#puppet");
-		if(!puppet){
-			puppet = dom.add(document.body, ['<div id="puppet"></div>']);
-		}
-		dom.add(puppet, [
-			'<div id="puppet-header">Puppet IFrames</div>',
-  			' <ol id="puppet-frames"></ol>',
-  			'</div>',
-  			'<div id="puppet-iframe-popup" class="hide"></div>'
-		]);
+		
 
     /*<li><strong>Example</strong><strong>./ex.html</strong><a>Show IFrame</a></li>
     <li>
@@ -210,4 +237,6 @@
 		select: ["true", "false"]
 	}, {})
 
+
+	console.log(serializeEvent(dom.get('.event')[0]));
 }());
