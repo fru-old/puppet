@@ -1,14 +1,68 @@
 (function(){
 
-	var global = window.Puppet = function(url){
+	// Event onload - initiate dom properly
+	document.addEventListener("DOMContentLoaded", function() {
+  		var puppet = dom.one("#puppet");
+		if(!puppet){
+			puppet = dom.add(document.body, ['<div id="puppet"></div>']);
+		}
+		dom.add(puppet, [
+			'<div id="puppet-header">Puppet IFrames</div>',
+  			' <ol id="puppet-frames"></ol>',
+  			'</div>',
+  			'<div id="puppet-iframe-popup" class="hide"></div>'
+		]);
+	});
 
+	// Constructor
+	window.Puppet = function(name, url){
+		var header = '';
+		if(!url){
+		url = name;
+			name = null;
+		}
+		if(name){
+			header += '<strong>'+name+'</strong>';
+		}
+		header += '<strong>'+url+'</strong>';
+		header = '<li>'+header+'<a>Show IFrame</a><ol class="hide"></ol></li>';
+		this.item = dom.add('#puppet-frames', header);
+		var iframe = '<iframe class="hide" src="'+url+'"></iframe>';
+		this.iframe = dom.add('#puppet-iframe-popup', iframe);
 	};
 
-	global.fn = global.prototype = {};
-	global.plugins = [];
+	// Static properties
+	window.Puppet.fn = window.Puppet.prototype = {};
+	window.Puppet.plugins = [];
+
+	// Static method
+	window.Puppet.close = function(){
+		dom.remove('#puppet-rightbar');
+		dom.one('#puppet-iframe-popup').classList.toggle('hide', true);
+		var iframes = dom.get('#puppet-iframe-popup iframe');
+		for(var i = 0; i < iframes.length; i++){
+			iframes[i].classList.toggle('hide', true);
+		}
+	};
+
+	window.Puppet.fn.openFullscreen = function(){
+		dom.add(document.body, [
+			'<div id="puppet-rightbar">',
+			' <div class="header">',
+			'  <select>',
+			'   <option>Add Event</option>',
+			'  </select>',
+			'  <span class="icon cross" onclick="Puppet.close();">Close Puppet</span>',
+			' </div>',
+			'</div>'
+		]);
+		var select = initiateUnselectableDropdownbox('#puppet-rightbar .header select');
+		//call plugins
+		dom.one('#puppet-iframe-popup').classList.toggle('hide', false);
+		this.iframe.classList.toggle('hide', false);
+	};
 
 	// Dom utilities used for basic manipulation	
-
 	var dom = {
 		get: function(base, nodes){
 			if(nodes === undefined){
@@ -26,7 +80,10 @@
 		},
 		remove: function(nodes){
 			nodes = dom.get(nodes);
-			for(var i in nodes)nodes[i].parentNode.removeChild(nodes[i]);
+			for(var i = 0; i < nodes.length; i++){
+				//if(!nodes[i] || !nodes[i].parentNode)continue;
+				nodes[i].parentNode.removeChild(nodes[i]);
+			}
 		},
 		add: function(single, html){
 			if(html.join)html = html.join('\n');
@@ -56,18 +113,7 @@
 		}
 	};
 
-	document.addEventListener("DOMContentLoaded", function() {
-  		var puppet = dom.one("#puppet");
-		if(!puppet){
-			puppet = dom.add(document.body, ['<div id="puppet"></div>']);
-		}
-		dom.add(puppet, [
-			'<div id="puppet-header">Puppet IFrames</div>',
-  			' <ol id="puppet-frames"></ol>',
-  			'</div>',
-  			'<div id="puppet-iframe-popup" class="hide"></div>'
-		]);
-	});
+	
 
 	
 	// Private methods for specific dom functionality
@@ -168,21 +214,6 @@
 		}
 	}
 
-	function openRightBar(){
-		dom.add(document.body, [
-			'<div id="puppet-rightbar">',
-			' <div class="header">',
-			'  <select>',
-			'   <option>Add Event</option>',
-			'  </select>',
-			'  <span class="icon cross" onclick="Puppet.close();">Close Puppet</span>',
-			' </div>',
-			'</div>'
-		]);
-
-		var select = initiateUnselectableDropdownbox('#puppet-rightbar .header select');
-	}
-
 	function serializeEvent(element){
 		var result = {};
 		var name = dom.text(element, '.event-name').join('').trim();
@@ -200,9 +231,6 @@
 		return JSON.stringify(result);
 	}
 
-	function initiatePuppet(){
-		
-
     /*<li><strong>Example</strong><strong>./ex.html</strong><a>Show IFrame</a></li>
     <li>
       <strong>Testname</strong><strong>./simple/test.html</strong><a>Show IFrame</a>
@@ -213,30 +241,33 @@
       </ol>
     </li>
     <li><strong>./simple/simple.html</strong><a>Show IFrame</a></li>*/
-	}
-
-	initiatePuppet();
-	openRightBar();
-	addEventToRightBar("test", {
-		test: "test",
-		x: "xvalue",
-		select: ["true", "false"]
-	}, {})
-
-	addEventToRightBar("test", {
-		test: "test",
-		x: "xvalue",
-		select: ["true", "false"]
-	}, {
-		addable: ["true", "false"]
-	})
-
-	addEventToRightBar("test", {
-		test: "test",
-		x: "xvalue",
-		select: ["true", "false"]
-	}, {})
 
 
-	console.log(serializeEvent(dom.get('.event')[0]));
+	document.addEventListener("DOMContentLoaded", function() {
+		var puppet = new Puppet("test", "http://tutorialzine.com/2012/04/5-lightweight-jquery-alternatives/");
+		puppet.openFullscreen();
+
+		addEventToRightBar("test", {
+			test: "test",
+			x: "xvalue",
+			select: ["true", "false"]
+		}, {});
+
+		addEventToRightBar("test", {
+			test: "test",
+			x: "xvalue",
+			select: ["true", "false"]
+		}, {
+			addable: ["true", "false"]
+		});
+
+		addEventToRightBar("test", {
+			test: "test",
+			x: "xvalue",
+			select: ["true", "false"]
+		}, {});
+
+		console.log(serializeEvent(dom.get('.event')[0]));
+	});
+	
 }());
